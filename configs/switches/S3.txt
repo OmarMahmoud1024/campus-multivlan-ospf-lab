@@ -1,0 +1,50 @@
+! ---------------------------------------------------------------
+! S3 - Cisco 2960-24TT - running-config
+! Hosts VLAN 30 (PC0, PC1) and VLAN 40 (PC2, PC3). Trunks up to R3.
+! ---------------------------------------------------------------
+hostname S3
+!
+enable secret lab456
+service password-encryption
+!
+vlan 30
+ name HR
+!
+vlan 40
+ name FINANCE
+!
+interface FastEthernet0/1
+ description Trunk to R3
+ switchport mode trunk
+ switchport trunk allowed vlan 30,40
+!
+interface FastEthernet0/2
+ description PC0
+ switchport mode access
+ switchport access vlan 30
+!
+interface FastEthernet0/3
+ description PC1
+ switchport mode access
+ switchport access vlan 30
+!
+interface FastEthernet0/4
+ description PC2
+ switchport mode access
+ switchport access vlan 40
+!
+interface FastEthernet0/5
+ description PC3
+ switchport mode access
+ switchport access vlan 40
+!
+line con 0
+ password lab456
+ login
+!
+line vty 0 4
+ password lab456
+ login
+ transport input telnet
+!
+end

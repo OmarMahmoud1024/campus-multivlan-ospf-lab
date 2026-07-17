@@ -1,0 +1,46 @@
+! ---------------------------------------------------------------
+! S2 - Cisco 2960-24TT - running-config
+! Hosts VLAN 50 (PC8, PC9) and VLAN 100 (Server0 - the DHCP server).
+! Trunks up to R2.
+! ---------------------------------------------------------------
+hostname S2
+!
+enable secret lab456
+service password-encryption
+!
+vlan 50
+ name ENGINEERING
+!
+vlan 100
+ name SERVERS
+!
+interface FastEthernet0/1
+ description Trunk to R2
+ switchport mode trunk
+ switchport trunk allowed vlan 50,100
+!
+interface FastEthernet0/2
+ description PC8
+ switchport mode access
+ switchport access vlan 50
+!
+interface FastEthernet0/3
+ description PC9
+ switchport mode access
+ switchport access vlan 50
+!
+interface FastEthernet0/4
+ description Server0 - DHCP server for the whole campus (except S4/S5)
+ switchport mode access
+ switchport access vlan 100
+!
+line con 0
+ password lab456
+ login
+!
+line vty 0 4
+ password lab456
+ login
+ transport input telnet
+!
+end

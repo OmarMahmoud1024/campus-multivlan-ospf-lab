@@ -1,0 +1,45 @@
+! ---------------------------------------------------------------
+! S1 - Cisco 2960-24TT - running-config
+! Hosts VLAN 10 (PC4, PC5) and VLAN 20 (PC6). Trunks up to R1.
+! ---------------------------------------------------------------
+hostname S1
+!
+enable secret lab456
+service password-encryption
+!
+vlan 10
+ name SALES
+!
+vlan 20
+ name IT
+!
+interface FastEthernet0/1
+ description Trunk to R1
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20
+!
+interface FastEthernet0/2
+ description PC4
+ switchport mode access
+ switchport access vlan 10
+!
+interface FastEthernet0/3
+ description PC5
+ switchport mode access
+ switchport access vlan 10
+!
+interface FastEthernet0/4
+ description PC6
+ switchport mode access
+ switchport access vlan 20
+!
+line con 0
+ password lab456
+ login
+!
+line vty 0 4
+ password lab456
+ login
+ transport input telnet
+!
+end

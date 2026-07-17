@@ -1,0 +1,29 @@
+! ---------------------------------------------------------------
+! S4 - Cisco 2960-24TT - running-config
+! Flat access switch on R4's 172.16.0.0/16 LAN. Hosts here (PC10)
+! are deliberately excluded from DHCP per the lab spec, so no VLAN
+! segmentation or DHCP relay is needed - default VLAN 1 access ports.
+! ---------------------------------------------------------------
+hostname S4
+!
+enable secret lab456
+service password-encryption
+!
+interface FastEthernet0/1
+ description Link to R4
+ switchport mode access
+!
+interface FastEthernet0/2
+ description PC10 - statically addressed, not served by DHCP
+ switchport mode access
+!
+line con 0
+ password lab456
+ login
+!
+line vty 0 4
+ password lab456
+ login
+ transport input telnet
+!
+end
