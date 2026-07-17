@@ -1,0 +1,54 @@
+! ---------------------------------------------------------------
+! R3 - Cisco 2911 - running-config
+! Role: router-on-a-stick for S3 (VLAN 30, VLAN 40), OSPF to R2
+! ---------------------------------------------------------------
+hostname R3
+!
+enable secret lab123
+service password-encryption
+no ip domain-lookup
+!
+interface GigabitEthernet0/0
+ description Link to R2
+ ip address 10.10.20.2 255.255.255.0
+ duplex auto
+ speed auto
+ no shutdown
+!
+interface GigabitEthernet0/1
+ description Trunk to S3
+ no ip address
+ duplex auto
+ speed auto
+ no shutdown
+!
+interface GigabitEthernet0/1.30
+ description VLAN 30 - HR gateway
+ encapsulation dot1Q 30
+ ip address 192.168.30.1 255.255.255.0
+ ip helper-address 192.168.100.10
+!
+interface GigabitEthernet0/1.40
+ description VLAN 40 - Finance gateway
+ encapsulation dot1Q 40
+ ip address 192.168.40.1 255.255.255.0
+ ip helper-address 192.168.100.10
+!
+router ospf 1
+ router-id 3.3.3.3
+ network 10.10.20.0 0.0.0.255 area 0
+ network 192.168.30.0 0.0.0.255 area 0
+ network 192.168.40.0 0.0.0.255 area 0
+!
+ip classless
+!
+line con 0
+ password lab123
+ login
+!
+line vty 0 4
+ password lab123
+ login
+ transport input telnet
+!
+end

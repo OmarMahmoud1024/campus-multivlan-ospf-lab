@@ -1,0 +1,54 @@
+! ---------------------------------------------------------------
+! R1 - Cisco 2911 - running-config
+! Role: router-on-a-stick for S1 (VLAN 10, VLAN 20), OSPF to R2
+! ---------------------------------------------------------------
+hostname R1
+!
+enable secret lab123
+service password-encryption
+no ip domain-lookup
+!
+interface GigabitEthernet0/0
+ description Trunk to S1
+ no ip address
+ duplex auto
+ speed auto
+ no shutdown
+!
+interface GigabitEthernet0/0.10
+ description VLAN 10 - Sales gateway
+ encapsulation dot1Q 10
+ ip address 192.168.10.1 255.255.255.0
+ ip helper-address 192.168.100.10
+!
+interface GigabitEthernet0/0.20
+ description VLAN 20 - IT gateway
+ encapsulation dot1Q 20
+ ip address 192.168.20.1 255.255.255.0
+ ip helper-address 192.168.100.10
+!
+interface GigabitEthernet0/1
+ description Link to R2
+ ip address 10.10.10.1 255.255.255.0
+ duplex auto
+ speed auto
+ no shutdown
+!
+router ospf 1
+ router-id 1.1.1.1
+ network 192.168.10.0 0.0.0.255 area 0
+ network 192.168.20.0 0.0.0.255 area 0
+ network 10.10.10.0 0.0.0.255 area 0
+!
+ip classless
+!
+line con 0
+ password lab123
+ login
+!
+line vty 0 4
+ password lab123
+ login
+ transport input telnet
+!
+end

@@ -1,0 +1,41 @@
+! ---------------------------------------------------------------
+! R5 - Cisco 2911 - running-config
+! Role: edge router, static routing only (no OSPF process here).
+!       Local LAN to S5 (no DHCP relay - S5-attached hosts are
+!       statically addressed by design).
+! ---------------------------------------------------------------
+hostname R5
+!
+enable secret lab123
+service password-encryption
+no ip domain-lookup
+!
+interface GigabitEthernet0/0
+ description Link to R4 (static routing, not in OSPF)
+ ip address 20.20.20.2 255.255.255.0
+ duplex auto
+ speed auto
+ no shutdown
+!
+interface GigabitEthernet0/1
+ description LAN to S5 - excluded from DHCP, static addressing only
+ ip address 192.168.200.1 255.255.255.0
+ duplex auto
+ speed auto
+ no shutdown
+!
+! Default route back toward the rest of the network via R4.
+ip route 0.0.0.0 0.0.0.0 20.20.20.1
+!
+ip classless
+!
+line con 0
+ password lab123
+ login
+!
+line vty 0 4
+ password lab123
+ login
+ transport input telnet
+!
+end

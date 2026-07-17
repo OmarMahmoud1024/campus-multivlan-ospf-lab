@@ -1,0 +1,58 @@
+! ---------------------------------------------------------------
+! R4 - Cisco 2911 - running-config
+! Role: OSPF on the R2-facing side, STATIC routing on the R5-facing
+!       side per the lab requirement. Local LAN to S4 (no DHCP relay -
+!       S4-attached hosts are statically addressed by design).
+! ---------------------------------------------------------------
+hostname R4
+!
+enable secret lab123
+service password-encryption
+no ip domain-lookup
+!
+interface GigabitEthernet0/0
+ description Link to R2 (OSPF)
+ ip address 10.10.50.2 255.255.255.0
+ duplex auto
+ speed auto
+ no shutdown
+!
+interface GigabitEthernet0/1
+ description LAN to S4 - excluded from DHCP, static addressing only
+ ip address 172.16.0.1 255.255.0.0
+ duplex auto
+ speed auto
+ no shutdown
+!
+interface GigabitEthernet0/2
+ description Link to R5 (static routing, not in OSPF)
+ ip address 20.20.20.1 255.255.255.0
+ duplex auto
+ speed auto
+ no shutdown
+!
+router ospf 1
+ router-id 4.4.4.4
+ network 10.10.50.0 0.0.0.255 area 0
+ network 172.16.0.0 0.0.255.255 area 0
+ ! R4-R5 link (20.20.20.0/24) and R5's LAN are intentionally NOT
+ ! advertised via OSPF - see static route + redistribute below.
+ redistribute static subnets
+!
+! Static route to R5's LAN, as required by the lab spec.
+! Redistributed into OSPF so R1/R2/R3 can still reach 192.168.200.0/24
+! without R4-R5 itself running a dynamic protocol.
+ip route 192.168.200.0 255.255.255.0 20.20.20.2
+!
+ip classless
+!
+line con 0
+ password lab123
+ login
+!
+line vty 0 4
+ password lab123
+ login
+ transport input telnet
+!
+end

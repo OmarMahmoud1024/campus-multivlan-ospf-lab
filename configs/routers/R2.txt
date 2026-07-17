@@ -1,0 +1,70 @@
+! ---------------------------------------------------------------
+! R2 - Cisco 2911 - running-config
+! Role: core router - OSPF hub between R1, R3, R4, and router-on-a-stick
+!       for S2 (VLAN 50, VLAN 100 / DHCP server subnet)
+! ---------------------------------------------------------------
+hostname R2
+!
+enable secret lab123
+service password-encryption
+no ip domain-lookup
+!
+interface GigabitEthernet0/0
+ description Link to R1
+ ip address 10.10.10.2 255.255.255.0
+ duplex auto
+ speed auto
+ no shutdown
+!
+interface GigabitEthernet0/1
+ description Link to R3
+ ip address 10.10.20.1 255.255.255.0
+ duplex auto
+ speed auto
+ no shutdown
+!
+interface GigabitEthernet0/2
+ description Link to R4
+ ip address 10.10.50.1 255.255.255.0
+ duplex auto
+ speed auto
+ no shutdown
+!
+interface GigabitEthernet0/3
+ description Trunk to S2
+ no ip address
+ duplex auto
+ speed auto
+ no shutdown
+!
+interface GigabitEthernet0/3.50
+ description VLAN 50 - Engineering gateway
+ encapsulation dot1Q 50
+ ip address 192.168.50.1 255.255.255.0
+ ip helper-address 192.168.100.10
+!
+interface GigabitEthernet0/3.100
+ description VLAN 100 - Server farm gateway (DHCP server lives here, no relay needed)
+ encapsulation dot1Q 100
+ ip address 192.168.100.1 255.255.255.0
+!
+router ospf 1
+ router-id 2.2.2.2
+ network 10.10.10.0 0.0.0.255 area 0
+ network 10.10.20.0 0.0.0.255 area 0
+ network 10.10.50.0 0.0.0.255 area 0
+ network 192.168.50.0 0.0.0.255 area 0
+ network 192.168.100.0 0.0.0.255 area 0
+!
+ip classless
+!
+line con 0
+ password lab123
+ login
+!
+line vty 0 4
+ password lab123
+ login
+ transport input telnet
+!
+end
